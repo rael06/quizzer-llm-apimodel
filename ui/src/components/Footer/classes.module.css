@@ -1,0 +1,10 @@
+.root {
+  display: flex;
+  flex-direction: column;
+}
+
+.link {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
