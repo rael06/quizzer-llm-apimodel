@@ -6,7 +6,7 @@ export const frDictionary: Dictionary = {
     home: "Accueil",
   },
   header: {
-    title: "Quizzer-llm",
+    title: "Quizzer-llm-via-api",
     description:
       "Un jeu utilisant une version auto-hébergée de LLM Mistral AI 7B Instruct",
   },
