@@ -33,7 +33,7 @@ function Footer() {
           {dictionary.footer.license}
         </Typography>
         <Link
-          to="https://github.com/rael06/quizzer-llm?tab=readme-ov-file#license"
+          to="https://github.com/rael06/quizzer-llm-apimodel?tab=readme-ov-file#license"
           target="_blank"
           rel="noreferrer"
         >
@@ -59,7 +59,11 @@ function Footer() {
         <Typography variant="body2" fontSize={12} fontStyle="italic">
           {dictionary.footer.modelSource}
         </Typography>
-        <Link to="https://mistral.ai" target="_blank" rel="noreferrer">
+        <Link
+          to="https://platform.openai.com/docs/overview"
+          target="_blank"
+          rel="noreferrer"
+        >
           <Typography variant="body2" fontSize={12}>
             MistralAI
           </Typography>

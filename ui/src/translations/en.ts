@@ -7,8 +7,7 @@ export const enDictionary: Dictionary = {
   },
   header: {
     title: "Quizzer-llm-via-api",
-    description:
-      "A game using a self-hosted version of LLM Mistral AI 7B Instruct",
+    description: "A game featured by GPT 4o mini",
   },
   home: {
     input: {
@@ -24,7 +23,7 @@ export const enDictionary: Dictionary = {
 
       "Responsibility for the use of the site and the results generated cannot be engaged.",
 
-      "The model's efficiency is remarkable and deserves to be shared; this efficiency is better in English than in French. Other LLM (Large Language Models), as Mixtral 8x7B, should be better, but the machine hosting this project is not powerful enough to support them, also, as the machine is not always available, the service may be interrupted.",
+      "The model is GPT 4o mini provided via OpenAI api.",
 
       "I've created this project in a short amount of time to learn and share. Feel free to check out the source code documentation. For any questions, contact me 😇.",
     ],
@@ -52,6 +51,6 @@ export const enDictionary: Dictionary = {
     author: "2024, by Rael CALITRO: ",
     license: "License: ",
     sourceCode: "Source code: ",
-    modelSource: "Open source LLM AI model used from: ",
+    modelSource: "Model source: ",
   },
 };

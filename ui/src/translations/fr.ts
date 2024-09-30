@@ -7,8 +7,7 @@ export const frDictionary: Dictionary = {
   },
   header: {
     title: "Quizzer-llm-via-api",
-    description:
-      "Un jeu utilisant une version auto-hébergée de LLM Mistral AI 7B Instruct",
+    description: "Un jeu utilisant le model GPT 4o mini de OpenAI",
   },
   home: {
     input: {
@@ -24,7 +23,7 @@ export const frDictionary: Dictionary = {
 
       "La responsabilité de l'utilisation du site et des résultats générés ne peut être engagée.",
 
-      "L'efficacité du modèle est remarquable et mérite d'être partagée, cette efficacité est meilleure en anglais qu'en français. D'autres modèles LLM, comme Mixtral 8x7B seraient meilleurs, mais la machine hébergeant ce projet n'est pas assez puissante pour les supporter, également, la machine n'étant pas toujours disponible, le service peut être interrompu.",
+      "Le model LLM est GPT 4o mini distribué par OpenAI.",
 
       "J'ai créé ce projet en peu de temps pour apprendre et partager. N'hésitez pas à consulter la documentation du code source. Pour toute question, contactez-moi 😇.",
     ],
@@ -52,6 +51,6 @@ export const frDictionary: Dictionary = {
     author: "2024, par Rael CALITRO : ",
     license: "License : ",
     sourceCode: "Code source : ",
-    modelSource: "Modèle LLM IA open source utilisé de : ",
+    modelSource: "Source du modèle IA LLM : ",
   },
 };
