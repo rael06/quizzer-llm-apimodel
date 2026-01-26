@@ -28,6 +28,7 @@ function Footer() {
           </Typography>
         </Link>
       </Box>
+
       <Box className={classes.link}>
         <Typography variant="body2" fontSize={12} fontStyle="italic">
           {dictionary.footer.license}
