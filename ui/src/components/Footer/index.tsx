@@ -1,8 +1,8 @@
 import { Box, Typography } from "@mui/material";
 import { memo } from "react";
-import classes from "./classes.module.css";
 import { Link } from "react-router-dom";
 import { useLang } from "../../contexts/lang/context";
+import classes from "./classes.module.css";
 
 function Footer() {
   const { dictionary } = useLang();
@@ -52,20 +52,6 @@ function Footer() {
         >
           <Typography variant="body2" fontSize={12}>
             Github
-          </Typography>
-        </Link>
-      </Box>
-      <Box className={classes.link}>
-        <Typography variant="body2" fontSize={12} fontStyle="italic">
-          {dictionary.footer.modelSource}
-        </Typography>
-        <Link
-          to="https://platform.openai.com/docs/overview"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <Typography variant="body2" fontSize={12}>
-            MistralAI
           </Typography>
         </Link>
       </Box>
