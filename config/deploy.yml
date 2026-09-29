@@ -1,0 +1,76 @@
+# Deployed with Kamal 2 by .github/workflows/ci-cd.yml, following the conventions of the platform
+# repository rael06/vps (docs/architecture.md). This is the public deployment (no basic auth).
+service: quizzer-llm-apimodel
+image: quizzer-llm-apimodel
+
+servers:
+  web:
+    hosts:
+      - <%= ENV.fetch("VPS_HOST") %>
+    options:
+      read-only: true
+      # The image runs as `node` (uid 1000): its writable places belong to it.
+      tmpfs:
+        - /tmp:rw,noexec,nosuid,size=64m
+        - /home/node:rw,noexec,nosuid,size=16m,uid=1000,gid=1000
+      cap-drop: ALL
+      security-opt: no-new-privileges
+      memory: 512m
+      pids-limit: 256
+
+# Public through the shared tunnel: *.rael-calitro.ovh → cloudflared → kamal-proxy → this app.
+proxy:
+  host: quizzer-llm-apimodel.rael-calitro.ovh
+  app_port: 3099
+  healthcheck:
+    path: /api/health
+  # A question or an answer waits for the model API.
+  response_timeout: 60
+  # The proxy is shared: identical in every app (nginx holds 80/443; cloudflared reaches kamal-proxy:80).
+  # A new version applies with « Run workflow » + « Reboot kamal-proxy » (a few seconds of outage).
+  run:
+    publish: false
+    version: v0.10.0
+
+env:
+  clear:
+    # Fixed here: HTTP behind the proxy, public deployment talking to a model API.
+    ENVIRONMENT: production
+    HOST: 0.0.0.0
+    PORT: "3099"
+    HTTPS_CERTIFICATE: managed
+    USE_BASIC_AUTH: "false"
+    MODEL_COMMUNICATION_TYPE: api
+    CORS_ORIGINS: https://quizzer-llm-apimodel.rael-calitro.ovh
+    # Variables of the GitHub environment `production`.
+    API_MODEL_NAME: <%= ENV.fetch("API_MODEL_NAME").to_json %>
+    API_MODEL_URL: <%= ENV.fetch("API_MODEL_URL").to_json %>
+  secret:
+    - API_MODEL_SECRET
+
+logging:
+  options:
+    max-size: 10m
+    max-file: 3
+
+ssh:
+  user: kamal
+  port: <%= ENV.fetch("VPS_SSH_PORT") %>
+  # The key comes from the ssh-agent loaded by the workflow; the host key must match known_hosts.
+  config: .kamal/ssh_config
+  forward_agent: false
+
+# The image goes from the runner to the VPS through the SSH tunnel: no external registry.
+registry:
+  server: localhost:5555
+
+builder:
+  arch: amd64
+  args:
+    # Read by the React UI at build time.
+    REACT_APP_API_URL: https://quizzer-llm-apimodel.rael-calitro.ovh/api
+
+deploy_timeout: 60
+
+# Old versions kept on the VPS for `kamal rollback <version>`.
+retain_containers: 5

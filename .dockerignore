@@ -1,0 +1,14 @@
+.git
+.github
+.kamal
+.vscode
+**/node_modules
+ui/build
+api/dist
+api/src/public
+**/.env
+**/.env.*
+**/*.pem
+deploy.js
+Dockerfile
+.dockerignore
