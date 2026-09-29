@@ -50,7 +50,13 @@ if (EnvVariables.UseBasicAuth) {
   });
 
   server.after(() => {
-    server.addHook("onRequest", server.basicAuth);
+    server.addHook("onRequest", (request, reply, done) => {
+      // The health check stays open: Docker and kamal-proxy call it without credentials.
+      if (request.url.split("?")[0] === "/api/health") {
+        return done();
+      }
+      server.basicAuth(request, reply, done);
+    });
   });
 }
 
