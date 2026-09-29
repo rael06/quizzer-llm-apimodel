@@ -1,0 +1,69 @@
+# Checks every push and pull request (image build); on main, deploys the public instance to the VPS
+# with Kamal 2. Settings and secrets live in the GitHub environment `production` (Settings →
+# Environments); « Run workflow » on main redeploys them without a commit. See « Deployment » in the README.
+name: CI/CD
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      proxy_reboot:
+        description: "Reboot kamal-proxy with the proxy settings of config/deploy.yml instead of deploying (a few seconds of outage)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # The same build as the deployment: React UI, bundled API, production dependencies.
+      - run: docker build --build-arg REACT_APP_API_URL=https://quizzer-llm-apimodel.rael-calitro.ovh/api .
+
+  deploy:
+    needs: check
+    # DEPLOY_ENABLED is a repository variable: the switch to stop deployments.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment: production
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    env:
+      VPS_HOST: ${{ secrets.VPS_HOST }}
+      VPS_SSH_PORT: ${{ secrets.VPS_SSH_PORT }}
+      API_MODEL_NAME: ${{ vars.API_MODEL_NAME }}
+      API_MODEL_URL: ${{ vars.API_MODEL_URL }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+      - run: gem install kamal -v 2.12.0 --no-document
+      - name: Load the deploy key and trust the VPS host key
+        env:
+          KAMAL_SSH_KEY: ${{ secrets.KAMAL_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          eval "$(ssh-agent -s)" >/dev/null
+          printf '%s\n' "$KAMAL_SSH_KEY" | ssh-add - 2>/dev/null
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$GITHUB_ENV"
+      - name: Kamal
+        env:
+          API_MODEL_SECRET: ${{ secrets.API_MODEL_SECRET }}
+          PROXY_REBOOT: ${{ inputs.proxy_reboot }}
+        run: |
+          if [ "$PROXY_REBOOT" = true ]; then
+            kamal proxy reboot -y
+          else
+            kamal deploy
+          fi
+      - name: Release the deploy lock if the run was cancelled
+        if: cancelled()
+        run: kamal lock release

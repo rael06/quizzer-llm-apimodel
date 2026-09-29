@@ -50,16 +50,25 @@ If you want to run the UI application and API server separately locally, you can
 
 # Run the application
 
-If you want to run the application via docker, you just have to run:
+If you want to run the application via docker, you just have to run (with an `api/.env` file or `-e` settings):
 
-- `docker build -t quizzer-llm .`
-- `docker run -d -p 3099:3099 --name quizzer-llm quizzer-llm`
+- `docker build --build-arg REACT_APP_API_URL=http://localhost:3099/api -t quizzer-llm .`
+- `docker run -d -p 3099:3099 --env-file api/.env --name quizzer-llm quizzer-llm`
 
 Otherwise:
 
 - Run `npm start` to start the application
 - The application includes a .vscode configuration to run the application in debug mode.
 - To start the UI application and API server separately, run `npm run start:ui` and `npm run start:api` respectively.
+
+# Deployment
+
+The public instance runs on the VPS at `https://quizzer-llm-apimodel.rael-calitro.ovh`, deployed with [Kamal 2](https://kamal-deploy.org) (`config/deploy.yml`) following the conventions of the platform repository `rael06/vps`. GitHub Actions (`.github/workflows/ci-cd.yml`) builds the image on every push and pull request, and on `main` sends it to the VPS through the SSH tunnel and switches `kamal-proxy` once `/api/health` answers: no downtime (sessions live in memory, so a deployment ends the open quizzes).
+
+- **Image** (`Dockerfile`): `node:22-bookworm-slim`; the React UI is built with `REACT_APP_API_URL` (build argument set in `config/deploy.yml`), the API is bundled once with esbuild (`npm run bundle` in `api/`) and runs with `node dist/index.mjs` as the `node` user, read-only, with production dependencies only.
+- **Settings**: the public deployment settings are fixed in `config/deploy.yml` (`ENVIRONMENT`, `HOST`, `PORT`, `HTTPS_CERTIFICATE=managed`, `USE_BASIC_AUTH=false`, `MODEL_COMMUNICATION_TYPE=api`, `CORS_ORIGINS`). The GitHub environment `production`, restricted to `main`, holds the variables `API_MODEL_NAME`, `API_MODEL_URL` and the secrets `API_MODEL_SECRET`, `KAMAL_SSH_KEY`, `VPS_HOST`, `VPS_SSH_PORT`, `VPS_KNOWN_HOSTS`.
+- The repository variable `DEPLOY_ENABLED` (`true`/`false`) turns deployments on or off.
+- Rollback: `kamal app containers -q` lists the versions kept on the VPS, `kamal rollback <version>` switches back (see `docs/runbooks/workstation.md` in `rael06/vps`).
 
 ---
 

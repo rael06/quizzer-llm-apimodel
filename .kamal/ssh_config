@@ -1,0 +1,4 @@
+# Read by Kamal (net-ssh): refuse any VPS host key that is not in known_hosts.
+Host *
+  StrictHostKeyChecking yes
+  UserKnownHostsFile ~/.ssh/known_hosts
